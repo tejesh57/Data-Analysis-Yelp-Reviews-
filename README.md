@@ -23,7 +23,7 @@ Defines a Python UDF in Snowflake using the `TextBlob` library to perform sentim
 
 ### 3. `SQL Analysis in Snowflake`  
 **Purpose:**  
-Defines a Python UDF in Snowflake using the `TextBlob` library to perform sentiment analysis on review text and classify it as Positive, Neutral, or Negative.  
+Runs SQL queries on the structured and sentiment-enriched data to extract actionable insights, such as top-rated businesses, sentiment trends, and category-based performance.  
 **Stage:** Data Analysis & Reporting
 
 ---
