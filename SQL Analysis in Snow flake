@@ -1,0 +1,92 @@
+-- 1.find the number of businesses in each category
+with cte as(
+select business_id, trim(A.value) as category
+from tbl_yelp_businesses
+, lateral split_to_table(categories,',')A
+)
+
+select category, 
+       count(*) as no_of_businesses
+from cte 
+group by category
+order by no_of_businesses desc
+
+
+--select business_id , categories
+--from tbl_yelp_businesses
+--where categories ilike '%restaurant%'
+--limit 10
+
+-- 2.find the top 10 users who have reviewed the most businesses in the restaurants category
+select r.user_id, count(DISTINCT b.BUSINESS_ID) as no_of_reviews
+from tbl_yelp_businesses b join tbl_yelp_reviews r on b.business_id=r.business_id
+where b.categories ilike '%restaurant%'
+group by r.user_id
+order by 2 desc
+limit 10
+
+-- 3. find the most popular categories of businesses based on the number of reviews
+with cte as(
+select trim(A.value) as category, business_id, review_count
+from tbl_yelp_businesses
+,lateral split_to_table(categories,',')A
+)
+
+select c.category, count(*) as no_of_reviews
+from cte c inner join tbl_yelp_reviews r on c.business_id = r.business_id
+group by 1
+order by 2 desc
+
+-- 4.Find the top 3 most recent reviews for each business
+
+with cte as(
+select business_id, review_date , row_number() over (partition by business_id order by review_date desc) as rn
+from tbl_yelp_reviews
+)
+
+select * from cte
+where rn<=3
+
+-- 5.FIND THE MONTH HAVING MAXIMUM NUMBER OF REVIEWS
+select month(review_date), count(review_text) as no_of_reviews
+from tbl_yelp_reviews
+group by 1
+order by 2 desc
+
+-- 6. Find the percentage of 5-star reviews for each business
+select b.business_id, b.business_name, round(count(case when r.stars ='5' then 1 else null end)*100/count(*),2) as five_star_reviews
+from tbl_yelp_businesses b inner join tbl_yelp_reviews r on b.business_id = r.business_id
+group by 1,2
+
+-- 7. Find thetop 5 most reviewed businesses in each city
+with cte as(
+select b.city, r.business_id, b.business_name, count(*) as reviews
+from tbl_yelp_businesses b inner join tbl_yelp_reviews r on b.business_id=r.business_id
+group by 1,2,3
+)
+select *
+from cte
+qualify row_number() over(partition by city order by reviews desc) <=5
+order by city
+
+-- 8. Find the avg rating of restaurants with more than 100 reviews 
+select b.business_name , b.business_id, count(*) as total_reviews, avg(r.stars) as avg_rating
+from tbl_yelp_businesses b inner join tbl_yelp_reviews r on b.business_id = r.business_id
+group by 1,2
+having total_reviews >=100
+order by total_reviews
+
+-- 9. List the top 10 users who have written the most reviews along with the businesses they reviewed
+with cte as (
+select r.user_id, count(*) as total_reviews
+from tbl_yelp_reviews r inner join tbl_yelp_businesses b on r.business_id=b.business_id
+group by 1
+order by 2 desc
+limit 10
+)
+
+select user_id, business_id 
+from tbl_yelp_reviews
+where user_id in (select user_id from cte)
+group by 1,2
+order by 1
