@@ -41,6 +41,5 @@ Defines a Python UDF in Snowflake using the `TextBlob` library to perform sentim
 
 **Tejesh Alaparthi**  
 Email: alaparthitejesh8@gmail.com  
-LinkedIn: [[linkedin.com/in/tejesh-alaparthi](https://linkedin.com/in/tejesh-alaparthi)](https://www.linkedin.com/in/tejesh-alaparthi-362b74206/
-)
+LinkedIn: (https://www.linkedin.com/in/tejesh-alaparthi-362b74206/)
 
